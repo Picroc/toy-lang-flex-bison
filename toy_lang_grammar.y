@@ -129,7 +129,6 @@
 %type <blck> Block
 %type <rlt> Relation
 %type <rltop> RelationalOperator
-%type <mtp> MethodType
 
 %start CompilationUnit
 
@@ -194,8 +193,8 @@ Staticness
        ;
 
 MethodDeclaration
-       : Visibility Staticness MethodType IDENTIFIER Parameters
-            Body { $$ = new MethodDeclaration(*$4, $1, $2, $3, *$5, $6); std::cout << "New MethodDecl with name " << *$4 << std::endl;}
+       : Visibility Staticness Type IDENTIFIER Parameters Body { MethodType *mt = new CustomMethodType($3); $$ = new MethodDeclaration(*$4, $1, $2, mt, *$5, $6); std::cout << "New MethodDecl with name " << *$4 << std::endl;}
+       | Visibility Staticness VOID IDENTIFIER Parameters Body { MethodType* mt = new VoidMethodType(); $$ = new MethodDeclaration(*$4, $1, $2, mt, *$5, $6); std::cout << "New MethodDecl with name " << *$4 << std::endl;}
        ;
 
 Parameters
@@ -210,11 +209,6 @@ ParameterList
 
 Parameter
        : Type IDENTIFIER { $$ = new Parameter(*$2, $1); std::cout << "New Parameter " << *$2 << std::endl;}
-       ;
-
-MethodType
-       : Type { $$ = new CustomMethodType($1); }
-       | VOID { $$ = new VoidMethodType(); std::cout << "New VOID MethodType" << std::endl;}
        ;
 
 Body
