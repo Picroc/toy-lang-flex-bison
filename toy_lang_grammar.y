@@ -2,7 +2,8 @@
        #include "node.h"
        CompilationUnit* root;
 
-       extern int yylex();
+       extern "C" int yylex();
+       extern "C" int yyparse();
        void yyerror(const char *s) { printf("ERROR: %sn", s); }
 %}
 

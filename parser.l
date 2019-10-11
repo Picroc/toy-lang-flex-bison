@@ -2,7 +2,7 @@
     #include <iostream>
     #include <string>
     #include "node.h"
-    #include "parser.hpp"
+    #include "toy_lang_grammar.tab.h"
     #define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
     #define TOKEN(t) (yylval.token = t)
     extern "C" int yylex();
