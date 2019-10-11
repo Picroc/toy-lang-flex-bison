@@ -68,7 +68,7 @@ public:
     Term* term;
     AddSign* sign;
     TermsVec terms;
-    Terms();
+    Terms() {};
     Terms(Term* term, TermsVec terms, AddSign* sign) :
         term(term), terms(terms), sign(sign) {};
 };
@@ -87,7 +87,7 @@ public:
     LeftPart* l_part;
     NewType* type;
     Expression* exp;
-    Factor();
+    Factor() {};
     Factor(std::string value) : value(value) {};
     Factor(LeftPart* l_part) : l_part(l_part) {};
     Factor(NewType* type) : type(type) {};
@@ -99,7 +99,7 @@ public:
     MultSign* sign;
     Factor* factor;
     FactorsVec factors;
-    Factors();
+    Factors() {};
     Factors(Factor* factor, FactorsVec factors, MultSign* sign) :
         factor(factor), factors(factors), sign(sign) {};
 };
@@ -130,7 +130,7 @@ public:
 class Extension {
 public:
     std::string id;
-    Extension();
+    Extension() {};
     Extension(std::string id) : id(id) {};
 };
 
@@ -195,7 +195,7 @@ public:
 class Type {
 public:
     ArrayTail* arr_tail;
-    Type();
+    Type() {};
     Type(ArrayTail* arr_tail) : arr_tail(arr_tail) {};
 };
 class Int : public Type {};
@@ -264,7 +264,7 @@ public:
 class Return : public Statement {
 public:
     Expression* exp;
-    Return();
+    Return() {};
     Return(Expression* exp) : exp(exp) {};
 };
 
@@ -286,7 +286,7 @@ public:
 class Block : public Statement {
 public:
     Statements statements;
-    Block();
+    Block() {};
     Block(Statements statements) : statements(statements) {};
 };
 

@@ -136,40 +136,40 @@
 %%
 
 CompilationUnit
-       : Imports ClassDeclarations { root = new CompilationUnit(*$1, *$2); }
+       : Imports ClassDeclarations { root = new CompilationUnit(*$1, *$2); std::cout << "Processed CompUnit" << std::endl; }
        ;
 
 Imports
        :  /* empty */   { $$ = new Imports(); }
-       | Import Imports { $2->push_back($1); }
+       | Import Imports { $$ = new Imports(); $2->push_back($1); }
        ;
 
 Import
-       : IMPORT IDENTIFIER SEMICOLON { $$ = new Import(*$2); }
+       : IMPORT IDENTIFIER SEMICOLON { $$ = new Import(*$2); std::cout << "New Import: " << $$->identifier << std::endl; }
        ;
 
 ClassDeclarations
        : /* empty */                        { $$ = new ClassDeclarations(); }
-       | ClassDeclaration ClassDeclarations { $2->push_back($1); }
+       | ClassDeclaration ClassDeclarations { $$ = new ClassDeclarations(); $2->push_back($1); }
        ;
 
 ClassDeclaration
-       :        CLASS CompoundName Extension SEMICOLON ClassBody {$$ = new ClassDeclaration(*$2, $3, *$5);}
-       | PUBLIC CLASS CompoundName Extension SEMICOLON ClassBody {$$ = new ClassDeclaration(*$3, $4, *$6);}
+       :        CLASS CompoundName Extension SEMICOLON ClassBody {$$ = new ClassDeclaration(*$2, $3, *$5); std::cout << "New ClassDecl" << std::endl;}
+       | PUBLIC CLASS CompoundName Extension SEMICOLON ClassBody {$$ = new ClassDeclaration(*$3, $4, *$6); std::cout << "New public ClassDecl" << std::endl;}
        ;
 
 Extension
        : /* empty */ { $$ = new Extension(); }
-       | EXTENDS IDENTIFIER {$$ = new Extension(*$2);}
+       | EXTENDS IDENTIFIER {$$ = new Extension(*$2); std::cout << "Assigned Extension " << *$2 << std::endl;}
        ;
 
 ClassBody
-       : LBRACE              RBRACE {$$ = new ClassMembers();}
+       : LBRACE              RBRACE {$$ = new ClassMembers(); std::cout << "New Empty ClassBody" << std::endl;}
        | LBRACE ClassMembers RBRACE {$$ = $2;}
        ;
 
 ClassMembers
-       :              ClassMember { $$ = new ClassMembers(); $$->push_back($1) }
+       :              ClassMember { $$ = new ClassMembers(); $$->push_back($1); }
        | ClassMembers ClassMember { $1->push_back($2); }
        ;
 
@@ -179,27 +179,27 @@ ClassMember
        ;
 
 FieldDeclaration
-       : Visibility Staticness Type IDENTIFIER SEMICOLON { $$ = new FieldDeclaration(*$4, $1, $2, $3); }
+       : Visibility Staticness Type IDENTIFIER SEMICOLON { $$ = new FieldDeclaration(*$4, $1, $2, $3); std::cout << "New FieldDecl with name " << *$4 << std::endl;}
        ;
 
 Visibility
        : /* empty */ { $$ = new Visibility(); }
-       | PRIVATE { $$ = new Private(); }
-       | PUBLIC { $$ = new Public(); }
+       | PRIVATE { $$ = new Private(); std::cout << "New Private Visibility" << std::endl;}
+       | PUBLIC { $$ = new Public(); std::cout << "New Public Visibility" << std::endl; }
        ;
 
 Staticness
        : /* empty */ { $$ = new Staticness(); }
-       | STATIC      { $$ = new Static(); }
+       | STATIC      { $$ = new Static(); std::cout << "New Static" << std::endl;}
        ;
 
 MethodDeclaration
        : Visibility Staticness MethodType IDENTIFIER Parameters
-            Body { $$ = new MethodDeclaration(*$4, $1, $2, $3, *$5, $6); }
+            Body { $$ = new MethodDeclaration(*$4, $1, $2, $3, *$5, $6); std::cout << "New MethodDecl with name " << *$4 << std::endl;}
        ;
 
 Parameters
-       : LPAREN               RPAREN { $$ = new ParameterList(); }
+       : LPAREN               RPAREN { $$ = new ParameterList(); std::cout << "New EmptyParamList" << std::endl;}
        | LPAREN ParameterList RPAREN { $$ = $2; }
        ;
 
@@ -209,16 +209,16 @@ ParameterList
        ;
 
 Parameter
-       : Type IDENTIFIER { $$ = new Parameter(*$2, $1); }
+       : Type IDENTIFIER { $$ = new Parameter(*$2, $1); std::cout << "New Parameter " << *$2 << std::endl;}
        ;
 
 MethodType
        : Type { $$ = new CustomMethodType($1); }
-       | VOID { $$ = new VoidMethodType(); }
+       | VOID { $$ = new VoidMethodType(); std::cout << "New VOID MethodType" << std::endl;}
        ;
 
 Body
-       : LBRACE LocalDeclarations Statements RBRACE { $$ = new Body(*$2, *$3); }
+       : LBRACE LocalDeclarations Statements RBRACE { $$ = new Body(*$2, *$3); std::cout << "New Body" << std::endl;}
        ;
 
 LocalDeclarations
@@ -227,7 +227,7 @@ LocalDeclarations
        ;
 
 LocalDeclaration
-       : Type IDENTIFIER SEMICOLON { $$ = new LocalDeclaration(*$2, $1); }
+       : Type IDENTIFIER SEMICOLON { $$ = new LocalDeclaration(*$2, $1); std::cout << "New LocalDecl " << *$2 << std::endl;}
        ;
 
 Statements
@@ -246,36 +246,36 @@ Statement
        ;
 
 Assignment
-       : LeftPart ASSIGN Expression SEMICOLON { $$ = new Assignment($1, $3); }
+       : LeftPart ASSIGN Expression SEMICOLON { $$ = new Assignment($1, $3); std::cout << "New Assignment" << std::endl;}
        ;
 
 LeftPart
-       :                              CompoundName  { $$ = new LeftPart(*$1); }
-       | CompoundName LBRACKET Expression RBRACKET  { $$ = new LeftPart(*$1, $3); }
+       :                              CompoundName  { $$ = new LeftPart(*$1); std::cout << "New LeftPart" << std::endl;}
+       | CompoundName LBRACKET Expression RBRACKET  { $$ = new LeftPart(*$1, $3); std::cout << "New LeftPart with Expression" << std::endl;}
        ;
 
 CompoundName
-       :                  IDENTIFIER { $$ = new CompoundNames(); $$->push_back(new CompoundName(*$1)); }
-       | CompoundName DOT IDENTIFIER  { $1->push_back(new CompoundName(*$3)); }
+       :                  IDENTIFIER { $$ = new CompoundNames(); $$->push_back(new CompoundName(*$1)); std::cout << "New CompoundName part " << *$1 << std::endl;}
+       | CompoundName DOT IDENTIFIER  { $1->push_back(new CompoundName(*$3)); std::cout << "New CompoundName part with dot " << *$3 << std::endl;}
        ;
 
 IfStatement
-       : IF LPAREN Relation RPAREN Statement { $$ = new If($3, $5); }
-       | IF LPAREN Relation RPAREN Statement ELSE Statement { $$ = new If($3, $5, $7); }
+       : IF LPAREN Relation RPAREN Statement { $$ = new If($3, $5); std::cout << "New IfStatement" << std::endl;}
+       | IF LPAREN Relation RPAREN Statement ELSE Statement { $$ = new If($3, $5, $7); std::cout << "New IfElseStatement" << std::endl;}
        ;
 
 WhileStatement
-       : WHILE Relation LOOP Statement SEMICOLON { $$ = new While($2, $4); }
+       : WHILE Relation LOOP Statement SEMICOLON { $$ = new While($2, $4); std::cout << "New WhileStatement" << std::endl;}
        ;
 
 ReturnStatement
-       : RETURN            SEMICOLON { $$ = new Return(); }
-       | RETURN Expression SEMICOLON { $$ = new Return($2); }
+       : RETURN            SEMICOLON { $$ = new Return(); std::cout << "New emty Return" << std::endl;}
+       | RETURN Expression SEMICOLON { $$ = new Return($2); std::cout << "New ReturnStatement" << std::endl;}
        ;
 
 CallStatement
-       : CompoundName LPAREN              RPAREN SEMICOLON { $$ = new Call(*$1); }
-       | CompoundName LPAREN ArgumentList RPAREN SEMICOLON { $$ = new Call(*$1, *$3); }
+       : CompoundName LPAREN              RPAREN SEMICOLON { $$ = new Call(*$1); std::cout << "New empty call" << std::endl;}
+       | CompoundName LPAREN ArgumentList RPAREN SEMICOLON { $$ = new Call(*$1, *$3); std::cout << "New CallStatement" << std::endl;}
        ;
 
 ArgumentList
@@ -284,24 +284,24 @@ ArgumentList
        ;
 
 PrintStatement
-       : PRINT Expression SEMICOLON { $$ = new Print($2); }
+       : PRINT Expression SEMICOLON { $$ = new Print($2); std::cout << "New PrintStatement" << std::endl;}
        ;
 
 Block
-       : LBRACE            RBRACE  { $$ = new Block(); }
-       | LBRACE Statements RBRACE  { $$ = new Block(*$2); }
+       : LBRACE            RBRACE  { $$ = new Block(); std::cout << "New Empty Block" << std::endl;}
+       | LBRACE Statements RBRACE  { $$ = new Block(*$2); std::cout << "New Block statement" << std::endl;}
        ;
 
 Relation
-       :                               Expression { $$ = new Relation($1); }
-       | Expression RelationalOperator Expression { $$ = new Relation($1, $2, $3); }
+       :                               Expression { $$ = new Relation($1); std::cout << "New Relation" << std::endl;}
+       | Expression RelationalOperator Expression { $$ = new Relation($1, $2, $3); std::cout << "New Relation" << std::endl;}
        ;
 
 RelationalOperator
-       : LESS { $$ = new Less(); }
-       | GREATER { $$ = new Greater(); }
-       | EQUAL { $$ = new Equal(); }
-       | NOT_EQUAL { $$ = new NotEqual(); }
+       : LESS { $$ = new Less(); std::cout << "New Operator LESS" << std::endl;}
+       | GREATER { $$ = new Greater(); std::cout << "New Operator GREATER" << std::endl;}
+       | EQUAL { $$ = new Equal(); std::cout << "New Operator EQUAL" << std::endl;}
+       | NOT_EQUAL { $$ = new NotEqual(); std::cout << "New Operator NOT_EQUAL" << std::endl;}
        ;
 
 Expression
@@ -310,13 +310,13 @@ Expression
        ;
 
 AddSign
-       : PLUS { $$ = new Plus(); }
-       | MINUS { $$ = new Minus(); }
+       : PLUS { $$ = new Plus(); std::cout << "New sign PLUS" << std::endl;}
+       | MINUS { $$ = new Minus(); std::cout << "New sign MINUS" << std::endl;}
        ;
 
 Terms
        : /* empty */ { $$ = new Terms(); }
-       | AddSign Term Terms { TermPair* tp = new TermPair($1, $2); $3->terms.push_back(*tp); }
+       | AddSign Term Terms { $$ = new Terms(); TermPair* tp = new TermPair($1, $2); $3->terms.push_back(*tp); }
        ;
 
 Term
@@ -325,37 +325,44 @@ Term
 
 Factors
        : /* empty */ { $$ = new Factors(); }
-       | MultSign Factor Factors { FactorPair* fp = new FactorPair($1, $2); $3->factors.push_back(*fp); }
+       | MultSign Factor Factors { $$ = new Factors(); FactorPair* fp = new FactorPair($1, $2); $3->factors.push_back(*fp); }
        ;
 
 MultSign
-       : MULTIPLY { $$ = new Multiply(); }
-       | DIVIDE { $$ = new Divide(); }
+       : MULTIPLY { $$ = new Multiply(); std::cout << "New sign MULTIPLY" << std::endl;}
+       | DIVIDE { $$ = new Divide(); std::cout << "New sign DIVIDE" << std::endl;}
        ;
 
 Factor
-       : NUMBER { $$ = new Factor(*$1); }
+       : NUMBER { $$ = new Factor(*$1); std::cout << "New Factor NUMBER " << *$1 << std::endl;}
        | LeftPart { $$ = new Factor($1); }
-       | NUL { $$ = new Factor(); }
+       | NUL { $$ = new Factor(); std::cout << "New Factor NULL" << std::endl;}
        | NEW NewType { $$ = new Factor($2); }
        | NEW NewType LBRACKET Expression RBRACKET { $$ = new Factor($2, $4); }
        ;
 
 NewType
-       : INT { $$ = new NewInt(); }
-       | REAL { $$ = new NewReal(); }
-       | IDENTIFIER { $$ = new NewCustom(*$1); }
+       : INT { $$ = new NewInt(); std::cout << "New NewType INT" << std::endl;}
+       | REAL { $$ = new NewReal(); std::cout << "New NewType REAL" << std::endl;}
+       | IDENTIFIER { $$ = new NewCustom(*$1); std::cout << "New custom NewType " << *$1 << std::endl;}
        ;
 
 Type
-       : INT        ArrayTail { $$ = new Int(); }
-       | REAL       ArrayTail { $$ = new Real(); }
-       | IDENTIFIER ArrayTail { $$ = new Custom(*$1); }
+       : INT        ArrayTail { $$ = new Int(); std::cout << "New Type INT" << std::endl;}
+       | REAL       ArrayTail { $$ = new Real(); std::cout << "New Type INT" << std::endl;}
+       | IDENTIFIER ArrayTail { $$ = new Custom(*$1); std::cout << "New custom Type " << *$1 << std::endl;}
        ;
 
 ArrayTail
        : /* empty */ { $$ = new ArrayTail(); }
-       | LBRACKET RBRACKET { $$ = new ArrayTail(); }
+       | LBRACKET RBRACKET { $$ = new ArrayTail(); std::cout << "New ArrayTail" << std::endl;}
        ;
 
 %%
+
+int main(int argc, char **argv)
+{
+    yyparse();
+    std::cout << root << std::endl;
+    return 0;
+}
