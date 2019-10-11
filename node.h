@@ -2,6 +2,35 @@
 #include <vector>
 #include <string>
 
+class Import;
+class ClassDeclaration;
+class LocalDeclaration;
+class Statement;
+class ClassMember;
+class Parameter;
+class Expression;
+class AddSign;
+class MultSign;
+class Term;
+class Factor;
+class CompoundName;
+
+class Terms;
+class Factors;
+class LeftPart;
+class NewType;
+class Extension;
+class Visibility;
+class Staticness;
+class Type;
+class MethodType;
+class Parameters;
+class Void;
+class ArrayTail;
+class Relation;
+class RelationalOperator;
+
+
 typedef std::vector<Import*> Imports;
 typedef std::vector<ClassDeclaration*> ClassDeclarations;
 typedef std::vector<LocalDeclaration*> LocalDeclarations;
@@ -9,18 +38,23 @@ typedef std::vector<Statement*> Statements;
 typedef std::vector<ClassMember*> ClassMembers;
 typedef std::vector<Parameter*> ParameterList;
 typedef std::vector<Expression*> ArgumentList;
-typedef std::vector<std::pair<AddSign*, Term*>> TermsVec;
-typedef std::vector<std::pair<MultSign*, Factor*>> FactorsVec;
+typedef std::pair<AddSign*, Term*> TermPair;
+typedef std::pair<MultSign*, Factor*> FactorPair;
+typedef std::vector<TermPair> TermsVec;
+typedef std::vector<FactorPair> FactorsVec;
+typedef std::vector<CompoundName*> CompoundNames;
 
 class CompilationUnit {
 public:
-    virtual ~CompilationUnit() {};
+    CompilationUnit() {};
 
     Imports imports;
     ClassDeclarations class_declaration;
+    CompilationUnit(Imports imports, ClassDeclarations class_declaration) :
+        imports(imports), class_declaration(class_declaration) {};
 };
 
-class Expression : public CompilationUnit {
+class Expression {
 public:
     Term* term;
     Terms* terms;
@@ -34,6 +68,7 @@ public:
     Term* term;
     AddSign* sign;
     TermsVec terms;
+    Terms();
     Terms(Term* term, TermsVec terms, AddSign* sign) :
         term(term), terms(terms), sign(sign) {};
 };
@@ -53,6 +88,7 @@ public:
     NewType* type;
     Expression* exp;
     Factor();
+    Factor(std::string value) : value(value) {};
     Factor(LeftPart* l_part) : l_part(l_part) {};
     Factor(NewType* type) : type(type) {};
     Factor(NewType* type, Expression* exp) : exp(exp) {};
@@ -76,31 +112,26 @@ class AddSign {};
 class Plus : public AddSign {};
 class Minus : public AddSign {};
 
-class Identifier {
-public:
-    std::string name;
-    Identifier(std::string name) : name(name) {};
-};
-
 class Import {
 public:
-    Identifier* identifier;
-    Import(Identifier* id) : identifier(id) {};
+    std::string identifier;
+    Import(std::string id) : identifier(id) {};
 };
 
 class ClassDeclaration {
 public:
-    CompoundName* name;
+    CompoundNames name;
     Extension* extension;
     ClassMembers body;
-    ClassDeclaration(CompoundName* name, Extension* extension, ClassMembers body) : 
+    ClassDeclaration(CompoundNames name, Extension* extension, ClassMembers body) : 
         name(name), extension(extension), body(body) {}; 
 };
 
 class Extension {
 public:
-    Identifier* id;
-    Extension(Identifier* id) : id(id) {};
+    std::string id;
+    Extension();
+    Extension(std::string id) : id(id) {};
 };
 
 class Body {
@@ -114,47 +145,36 @@ public:
 class ClassMember {};
 class FieldDeclaration : public ClassMember {
 public:
-    Identifier* id;
+    std::string id;
     Visibility* visibility;
     Staticness* staticness;
     Type* type;
-    FieldDeclaration(Identifier* id, Visibility* visibility, Staticness* staticness, Type* type) :
+    FieldDeclaration(std::string id, Visibility* visibility, Staticness* staticness, Type* type) :
         id(id), visibility(visibility), staticness(staticness), type(type) {};
 };
 class MethodDeclaration : public ClassMember {
 public:
-    Identifier* id;
+    std::string id;
     Visibility* visibility;
     Staticness* staticness;
     MethodType* m_type;
-    Parameters* parameters;
-    MethodDeclaration(Identifier* id, Visibility* visibility, Staticness* staticness, MethodType* m_type, Parameters* parameters) :
-        id(id), visibility(visibility), staticness(staticness), m_type(m_type), parameters(parameters) {};
+    ParameterList parameters;
+    Body* body;
+    MethodDeclaration(std::string id, Visibility* visibility, Staticness* staticness, MethodType* m_type, ParameterList parameters, Body* body) :
+        id(id), visibility(visibility), staticness(staticness), m_type(m_type), parameters(parameters), body(body) {};
 };
 
-class Parameters {
-public:
-    ParameterList* p_list;
-    Parameters(ParameterList* p_list) : p_list(p_list) {};
-};
+// class Parameters {
+// public:
+//     ParameterList* p_list;
+//     Parameters(ParameterList* p_list) : p_list(p_list) {};
+// };
 
 class Parameter {
 public:
-    Identifier* id;
+    std::string id;
     Type* type;
-    Parameter(Identifier* id, Type* type) : id(id), type(type) {};
-};
-
-class MethodType {};
-class CustomMethodType : public MethodType {
-public:
-    Type* type;
-    CustomMethodType(Type* type) :
-        type(type) {};
-};
-class VoidMethodType : public MethodType {
-    Type* type;
-    VoidMethodType() : type(new Void()) {};
+    Parameter(std::string id, Type* type) : id(id), type(type) {};
 };
 
 class Visibility {};
@@ -163,13 +183,12 @@ class Public : public Visibility {};
 
 class Staticness {};
 class Static : public Staticness {};
-class StaticnessEmpty : public Staticness {};
 
 class LocalDeclaration {
 public:
-    Identifier* id;
+    std::string id;
     Type* type;
-    LocalDeclaration(Identifier* id, Type* type) :
+    LocalDeclaration(std::string id, Type* type) :
         id(id), type(type) {};
 };
 
@@ -184,8 +203,8 @@ class Real : public Type {};
 class Void : public Type {};
 class Custom : public Type {
 public:
-    Identifier* type;
-    Custom(Identifier* type) : type(type) {};
+    std::string type;
+    Custom(std::string type) : type(type) {};
 };
 
 class ArrayTail {};
@@ -195,11 +214,11 @@ class NewInt : public NewType {};
 class NewReal : public NewType {};
 class NewCustom : public NewType {
 public:
-    Identifier* type;
-    NewCustom(Identifier* type) : type(type) {};
+    std::string type;
+    NewCustom(std::string type) : type(type) {};
 };
 
-class Statement : public CompilationUnit {};
+class Statement {};
 class Assignment : public Statement {
 public:
     LeftPart* left_part;
@@ -210,17 +229,17 @@ public:
 
 class LeftPart {
 public:
-    CompoundName* name;
+    CompoundNames name;
     Expression* exp;
-    LeftPart(CompoundName* name) : name(name) {};
-    LeftPart(CompoundName* name, Expression* exp) :
+    LeftPart(CompoundNames name) : name(name) {};
+    LeftPart(CompoundNames name, Expression* exp) :
         name(name), exp(exp) {};
 };
 
 class CompoundName {
 public:
-    Identifier* id;
-    CompoundName(Identifier* id) : id(id) {};
+    std::string id;
+    CompoundName(std::string id) : id(id) {};
 };
 
 class If : public Statement {
@@ -228,6 +247,8 @@ public:
     Relation* rel;
     Statement* l_statement;
     Statement* r_statement;
+    If(Relation* rel, Statement* l_statement) :
+        rel(rel), l_statement(l_statement) {};
     If(Relation* rel, Statement* l_statement, Statement* r_statement) :
         rel(rel), l_statement(l_statement), r_statement(r_statement) {};
 };
@@ -243,15 +264,16 @@ public:
 class Return : public Statement {
 public:
     Expression* exp;
+    Return();
     Return(Expression* exp) : exp(exp) {};
 };
 
 class Call : public Statement {
 public:
-    CompoundName* name;
+    CompoundNames name;
     ArgumentList arguments;
-    Call(CompoundName* name) : name(name) {};
-    Call(CompoundName* name, ArgumentList arguments) :
+    Call(CompoundNames name) : name(name) {};
+    Call(CompoundNames name, ArgumentList arguments) :
         name(name), arguments(arguments) {};
 };
 
@@ -261,7 +283,7 @@ public:
     Print(Expression* exp) : exp(exp) {};
 };
 
-class Block {
+class Block : public Statement {
 public:
     Statements statements;
     Block();
@@ -283,5 +305,18 @@ class Less : public RelationalOperator {};
 class Greater : public RelationalOperator {};
 class Equal : public RelationalOperator {};
 class NotEqual : public RelationalOperator {};
+
+class MethodType {};
+class CustomMethodType : public MethodType {
+public:
+    Type* type;
+    CustomMethodType(Type* type) :
+        type(type) {};
+};
+class VoidMethodType : public MethodType {
+public:
+    Type* type;
+    VoidMethodType() : type(new Void()) {};
+};
 
 

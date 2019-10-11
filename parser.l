@@ -4,8 +4,9 @@
     #include "node.h"
     #include "parser.hpp"
     #define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
-    #define TOKEN(t) (yyval.token = t)
-    extern int yylex();
+    #define TOKEN(t) (yylval.token = t)
+    extern "C" int yylex();
+    extern "C" int yyparse();
 %}
 
 %option noyywrap
@@ -25,7 +26,7 @@ while       return TOKEN(WHILE);
 loop        return TOKEN(LOOP);
 return      return TOKEN(RETURN);
 print       return TOKEN(PRINT);
-null        return TOKEN(NULL);
+null        return TOKEN(NUL);
 new         return TOKEN(NEW);
 int         return TOKEN(INT);
 real        return TOKEN(REAL);
@@ -47,7 +48,6 @@ real        return TOKEN(REAL);
 \-          return TOKEN(MINUS);
 \*          return TOKEN(MULTIPLY);
 \/          return TOKEN(DIVIDE);
-["][0-9A-Za-z#$%=@!{},`~&*()<>?.:;_|^\/+\t\r\n\s\[\]'-]*["] SAVE_TOKEN; return STRING;
 [0-9]+ SAVE_TOKEN; return NUMBER;
 [a-zA-Z]+[_]?[a-zA-Z0-9]* SAVE_TOKEN; return IDENTIFIER;
 %%
